@@ -274,11 +274,11 @@ The screen order is fixed:
 1. `Scoreboard` heading.
 2. The selected participant's three status lines: `You checked in today at: {timestamp}`, `wake points: {n} pt`, `total score: {n} pt`.
 3. One two-line block per participant: `{name} total pts: {cumulative}` and `Today: {timestamp or reported window} ({n} wake points)`. Append `· slept back` when that participant has a confirmed penalty.
-4. The action buttons, each on its own line: `(did u slp back?)`, `(rules)`, `(view history)`.
+4. The action buttons, each on its own line: `did u slp back?`, `rules`, `view history`.
 
 - Show `You checked in today at: {timestamp}` for live check-ins; include seconds and make the timezone clear (e.g. `UTC+8`).
 - For the seeded row show exactly `You checked in today at: 08:01–08:30`, with no invented timestamp.
-- Show the `(did u slp back?)` button.
+- Show the `did u slp back?` button.
 - Clicking it opens a modal with one randomly selected title per modal opening (not on every render):
   - `Oh no reallyyyy?`
   - `oh no reallyyy?`
@@ -299,7 +299,7 @@ The screen order is fixed:
 
 ### Rules and history content (visible from Stage 2 onward)
 
-Provide a `(rules)` control that opens a modal or panel containing:
+Provide a `rules` control that opens a modal or panel containing:
 
 - Challenge dates: 21–31 October 2026 inclusive; official timezone `UTC+8` (the challenge runs on `Asia/Kuala_Lumpur`, a fixed UTC+08:00 offset with no daylight saving).
 - The full wake-point table from §3, including exact second boundaries and the 5-point cap.
@@ -312,7 +312,7 @@ Provide a `(rules)` control that opens a modal or panel containing:
 
 - Show both participants' cumulative points and each participant's check-in time/reported window for today.
 - Keep the rules control reachable.
-- Show `(view history)` beneath the scoreboard. Open a modal or use `#history`; render 11 date rows with both participants' time/report, base wake points, sleep-back status and daily net points.
+- Show `view history` beneath the scoreboard. Open a modal or use `#history`; render 11 date rows with both participants' time/report, base wake points, sleep-back status and daily net points.
 - For a missing past/current record, show `Not checked in`. For future dates, show `—`.
 - Stage 3 hides the Stage 2 personal status/prompt panel; it does not hide the two-person scoreboard or today's per-person wake-time display.
 

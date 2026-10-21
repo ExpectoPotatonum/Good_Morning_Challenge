@@ -34,9 +34,9 @@ describe('copy variants', () => {
     expect(COPY.sleepBackYea).toBe('Yea ig...');
     expect(COPY.sleepBackNah).toBe('NAH JK i click for fun');
     expect(COPY.didYouSleepBack).toBe('did u slp back?');
-    expect(COPY.sleepBackButton).toBe('(did u slp back?)');
-    expect(COPY.rulesButton).toBe('(rules)');
-    expect(COPY.viewHistoryButton).toBe('(view history)');
+    expect(COPY.sleepBackButton).toBe('did u slp back?');
+    expect(COPY.rulesButton).toBe('rules');
+    expect(COPY.viewHistoryButton).toBe('view history');
     expect(COPY.switchPlayer).toBe('Switch player');
     expect(COPY.initialReportLabel).toBe('08:01–08:30');
     expect(COPY.challengeOver).toBe('Challenge over');
