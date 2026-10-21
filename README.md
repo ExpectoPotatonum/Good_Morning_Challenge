@@ -180,6 +180,11 @@ version, so a Netlify site only needs the two environment variables:
 - Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
 - Node version: the one in `.nvmrc` (`netlify.toml` sets `NODE_VERSION` too)
 
+The pinned version matters: Vite 8 requires Node `^20.19.0 || >=22.12.0`, so
+building on an older Node (for example `20.18.1`) fails with
+`Failed during stage 'building site'`. Keep `.nvmrc`, `netlify.toml` and the
+site's `NODE_VERSION` variable on the same release.
+
 Set the variables under **Site configuration → Environment variables** (or as
 `VITE_*` variables in `netlify.toml` — they are public by design). The
 publishable key is safe in the browser; never add a secret or service-role key.
