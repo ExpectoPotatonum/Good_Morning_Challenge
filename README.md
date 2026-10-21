@@ -253,18 +253,37 @@ Set the variables under **Site configuration → Environment variables** (or as
 `VITE_*` variables in `netlify.toml` — they are public by design). The
 publishable key is safe in the browser; never add a secret or service-role key.
 
-If the repository is linked to a Netlify site through the GitHub integration,
-every push to `master` deploys automatically. The site is linked to
-`https://github.com/ExpectoPotatonum/Good_Morning_Challenge`, so a push is
-enough — no manual deploy step is required.
+The repository is linked to the site through the GitHub integration, so a push
+to `master` triggers a build. **Production deploys on this site are locked**
+(Netlify → **Site configuration → Build & deploy → Deploy lock**), so a build
+finishes as `ready` but stays dark until it is published explicitly. A push on
+its own does not change the live site.
 
-To deploy by hand instead:
+After pushing, wait for the build to reach `ready`, then publish it:
 
 ```bash
 npx netlify-cli@latest link --id 7aa325a6-0abe-4bcf-9bd7-d5f7310447d1
-npx netlify-cli@latest build
-npx netlify-cli@latest deploy --prod --dir=dist
+
+# newest deploys first — note the id of the one for your commit
+npx netlify-cli@latest api listSiteDeploys \
+  --data '{"site_id":"7aa325a6-0abe-4bcf-9bd7-d5f7310447d1","per_page":3}'
+
+# publish it (this is what gets past the deploy lock)
+npx netlify-cli@latest api restoreSiteDeploy \
+  --data '{"site_id":"7aa325a6-0abe-4bcf-9bd7-d5f7310447d1","deploy_id":"<deploy id>"}'
 ```
+
+If a push produces no build at all (the webhook can miss), start one by hand and
+publish the deploy id it returns:
+
+```bash
+npx netlify-cli@latest api createSiteBuild \
+  --data '{"site_id":"7aa325a6-0abe-4bcf-9bd7-d5f7310447d1"}'
+```
+
+Building locally and uploading works too, but plain `deploy --prod` is refused on
+a locked site. `deploy --dir=dist --prod-if-unlocked` uploads `dist` as a draft
+instead, which the same `restoreSiteDeploy` call then publishes.
 
 No rewrite is needed: the app uses modals, not path-based routing. If Netlify
 flags the publishable key as a secret, safelist that exact value with
