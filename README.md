@@ -170,6 +170,8 @@ See `tests/db/README.md` for details.
 
 ## Deployment (Netlify)
 
+**Live site:** <https://goodmorningchallenge.netlify.app>
+
 `netlify.toml` already pins the build, the publish directory and the Node
 version, so a Netlify site only needs the two environment variables:
 
@@ -183,7 +185,17 @@ Set the variables under **Site configuration → Environment variables** (or as
 publishable key is safe in the browser; never add a secret or service-role key.
 
 If the repository is linked to a Netlify site through the GitHub integration,
-every push to `master` deploys automatically.
+every push to `master` deploys automatically. The site is linked to
+`https://github.com/ExpectoPotatonum/Good_Morning_Challenge`, so a push is
+enough — no manual deploy step is required.
+
+To deploy by hand instead:
+
+```bash
+npx netlify-cli@latest link --id 7aa325a6-0abe-4bcf-9bd7-d5f7310447d1
+npx netlify-cli@latest build
+npx netlify-cli@latest deploy --prod --dir=dist
+```
 
 No rewrite is needed: the app uses modals, not path-based routing. If Netlify
 flags the publishable key as a secret, safelist that exact value with
