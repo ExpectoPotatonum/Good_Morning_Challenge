@@ -4,11 +4,6 @@ import { HistoryModal } from './HistoryModal';
 import { RulesModal } from './RulesModal';
 import type { DashboardHistoryDate } from '../types';
 
-/**
- * Rules + history access. Visible from Stage 2 onward and in the
- * challenge-over view. `children` renders first, so Stage 2 can put the
- * sleep-back prompt in front of the rules and history controls.
- */
 export function SharedActions({
   history,
   serverDate,
@@ -23,14 +18,16 @@ export function SharedActions({
 
   return (
     <>
-      <section
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}
-      >
+      <section style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(12px, 1.8vh, 18px)' }}>
         {children}
-        <button onClick={() => setShowRules(true)}>{COPY.rulesButton}</button>
-        <button onClick={() => setShowHistory(true)}>{COPY.viewHistoryButton}</button>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button style={{ flex: 1 }} onClick={() => setShowRules(true)}>{COPY.rulesButton}</button>
+          <button style={{ flex: 1 }} onClick={() => setShowHistory(true)}>{COPY.viewHistoryButton}</button>
+        </div>
       </section>
+
       <RulesModal open={showRules} onClose={() => setShowRules(false)} />
+
       <HistoryModal
         open={showHistory}
         onClose={() => setShowHistory(false)}

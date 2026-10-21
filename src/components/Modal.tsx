@@ -3,19 +3,11 @@ import { useEffect, useRef, type ReactNode } from 'react';
 type ModalProps = {
   open: boolean;
   onClose: () => void;
-  /** Accessible name for the dialog. */
   label: string;
-  /** When false the dialog cannot be dismissed while a request is pending. */
   dismissible?: boolean;
   children: ReactNode;
 };
 
-/**
- * Accessible native <dialog> modal.
- * `showModal()` gives us the browser's focus trap, Escape handling and
- * top-layer/backdrop rendering. While a write is pending we keep the dialog
- * open and refuse to dismiss it so the user never loses the pending state.
- */
 export function Modal({ open, onClose, label, dismissible = true, children }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -61,17 +53,12 @@ export function Modal({ open, onClose, label, dismissible = true, children }: Mo
       ref={ref}
       aria-label={label}
       onClick={(event) => {
-        // Clicks on the backdrop land on the dialog element itself.
         if (event.target === ref.current && dismissible) onClose();
       }}
+      className="glass-dialog"
       style={{
-        border: 'none',
-        borderRadius: 12,
-        padding: 20,
-        maxWidth: 480,
-        maxHeight: '85vh',
-        overflow: 'auto',
-        fontFamily: 'system-ui',
+        border: '1px solid var(--card-border)',
+        margin: 'auto',
       }}
     >
       {open ? children : null}

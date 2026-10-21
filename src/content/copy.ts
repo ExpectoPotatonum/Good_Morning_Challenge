@@ -60,6 +60,7 @@ export const RULES_BULLETS: readonly string[] = [
 ];
 
 export const COPY = {
+  appTitle: 'Good Morning Challenge',
   stage1Helper: 'click below to check in for the day',
   notHavingGoodMorning: 'Not having a good morning? Click me',
   meowBlessing: ':ur blessed by meowmeow, now GOOD MORNING to you',
@@ -91,6 +92,23 @@ export const COPY = {
   lateSuffix: '— late',
   close: 'Close',
   pickPlayer: 'who r u',
+  unknownParticipant: 'Unknown participant',
+  backToPicker: 'Back to picker',
+  refresh: 'Refresh',
+  loading: 'Loading…',
+  noDataYet: 'No data yet.',
+  challengeDates: '21–31 October 2026',
+  rulesTitle: 'Rules',
+  wakePointsTitle: 'Wake points',
+  pointsColumn: 'Points',
+  localTimeColumn: 'Local time',
+  fivePointCapNote: 'The 5-point cap applies to every earlier time, including before 06:01.',
+  historyDate: 'Date',
+  historyPlayer: 'Player',
+  historyCheckIn: 'Check in',
+  historyWake: 'Wake',
+  historySleepBackColumn: 'Sleep back',
+  historyNet: 'Net',
 } as const;
 
 export function pickOne<T>(arr: readonly T[]): T {

@@ -11,21 +11,45 @@ import { CHALLENGE_UTC_LABEL } from './utils/format';
 function Main() {
   const { participantKey, setParticipantKey, dashboard, loading, refresh } = useApp();
 
-  if (!participantKey) return <UsernamePicker />;
+  // Persistent header: the challenge title on the left, Switch player on the
+  // right once a participant is selected. Rendered in every stage.
+  const header = (
+    <header className="app-header">
+      <h1 className="app-title">{COPY.appTitle}</h1>
+      {participantKey ? (
+        <button className="btn-ghost app-switch" onClick={() => setParticipantKey(null)}>{COPY.switchPlayer}</button>
+      ) : null}
+    </header>
+  );
+
+  if (!participantKey) {
+    return (
+      <div className="app-container">
+        {header}
+        <UsernamePicker />
+      </div>
+    );
+  }
 
   if (dashboard?.error === 'UNKNOWN_PARTICIPANT') {
     return (
-      <div style={{ padding: 24, maxWidth: 420, margin: '40px auto', fontFamily: 'system-ui' }}>
-        <p>Unknown participant</p>
-        <button onClick={() => setParticipantKey(null)}>Back to picker</button>
+      <div className="app-container">
+        {header}
+        <div className="glass-card" style={{ textAlign: 'center' }}>
+          <p>{COPY.unknownParticipant}</p>
+          <button className="btn-primary" style={{ marginTop: 16 }} onClick={() => setParticipantKey(null)}>{COPY.backToPicker}</button>
+        </div>
       </div>
     );
   }
 
   if (!dashboard) {
     return (
-      <div style={{ padding: 24, maxWidth: 420, margin: '40px auto', fontFamily: 'system-ui' }}>
-        <p aria-live="polite">{loading ? 'Loading…' : 'No data yet.'}</p>
+      <div className="app-container">
+        {header}
+        <div className="glass-card" style={{ textAlign: 'center', padding: '48px 24px' }}>
+          <p aria-live="polite">{loading ? COPY.loading : COPY.noDataYet}</p>
+        </div>
       </div>
     );
   }
@@ -37,21 +61,17 @@ function Main() {
   const selected = dashboard.selected ?? { participant_key: participantKey, display_name: participantKey };
   const self = participants.find((p) => p.participant_key === participantKey);
 
-  const switchPlayer = (
-    <div style={{ textAlign: 'right', padding: 12 }}>
-      <button onClick={() => setParticipantKey(null)}>{COPY.switchPlayer}</button>
-    </div>
-  );
-
   if (status === 'over') {
     return (
-      <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui', padding: 16 }}>
-        {switchPlayer}
-        <h1>{COPY.challengeOver}</h1>
-        <Scoreboard participants={participants} />
-        <SharedActions history={history} serverDate={serverDate} />
-        <div style={{ marginTop: 12 }}>
-          <button onClick={() => refresh()}>Refresh</button>
+      <div className="app-container">
+        {header}
+        <div className="glass-card">
+          <h1 style={{ textAlign: 'center' }}>{COPY.challengeOver}</h1>
+          <Scoreboard participants={participants} />
+          <SharedActions history={history} serverDate={serverDate} />
+          <div style={{ marginTop: 24, textAlign: 'center' }}>
+            <button className="btn-ghost" onClick={() => refresh()}>{COPY.refresh}</button>
+          </div>
         </div>
       </div>
     );
@@ -59,13 +79,15 @@ function Main() {
 
   if (status === 'before') {
     return (
-      <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui', padding: 16 }}>
-        {switchPlayer}
-        <h1>{COPY.challengeNotStarted}</h1>
-        <p>
-          21–31 October 2026 · {CHALLENGE_UTC_LABEL}
-        </p>
-        <SharedActions history={history} serverDate={serverDate} />
+      <div className="app-container">
+        {header}
+        <div className="glass-card" style={{ textAlign: 'center' }}>
+          <h1>{COPY.challengeNotStarted}</h1>
+          <p style={{ color: 'var(--text-muted)', marginBottom: 32 }}>
+            {COPY.challengeDates} · {CHALLENGE_UTC_LABEL}
+          </p>
+          <SharedActions history={history} serverDate={serverDate} />
+        </div>
       </div>
     );
   }
@@ -73,8 +95,8 @@ function Main() {
   // Stage 1 — not checked in today: only the check-in experience is shown.
   if (!self?.today.has_record) {
     return (
-      <div>
-        {switchPlayer}
+      <div className="app-container">
+        {header}
         <Stage1 />
       </div>
     );
@@ -83,8 +105,8 @@ function Main() {
   // Stage 3 — a sleep-back penalty was already confirmed for this participant.
   if (self.today.sleep_back_at) {
     return (
-      <div>
-        {switchPlayer}
+      <div className="app-container">
+        {header}
         <Stage3 participants={participants} history={history} serverDate={serverDate} />
       </div>
     );
@@ -92,8 +114,8 @@ function Main() {
 
   // Stage 2 — shared content plus this participant's status and sleep-back prompt.
   return (
-    <div>
-      {switchPlayer}
+    <div className="app-container">
+      {header}
       <Stage2 participants={participants} selected={selected} history={history} serverDate={serverDate} />
     </div>
   );

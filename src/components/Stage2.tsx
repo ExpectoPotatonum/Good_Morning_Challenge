@@ -76,28 +76,38 @@ export function Stage2({
       : formatChallengeTimestamp(self?.today.checked_in_at);
 
   return (
-    <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui', padding: 16 }}>
+    <div className="glass-card">
       <Scoreboard participants={participants}>
         {self && hasRecord && (
-          <div style={{ marginBottom: 12 }}>
-            <div>
+          <div style={{
+            background: 'rgba(0,0,0,0.03)',
+            borderRadius: 16,
+            padding: 'clamp(14px, 2vh, 18px) 16px',
+            marginBottom: 'clamp(16px, 2.2vh, 22px)',
+            border: '1px solid var(--card-border)',
+          }}>
+            <div style={{ color: 'var(--text-h)', fontSize: 22, fontWeight: 800, lineHeight: 1.2, marginBottom: 8 }}>
               {COPY.youCheckedInTodayAt} {when}
             </div>
-            <div>
+            <div style={{ fontSize: 14, color: 'var(--text-muted)', marginBottom: 2 }}>
               {COPY.wakePointsLine} {formatPoints(self.today.wake_points)}
             </div>
-            <div>
+            <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
               {COPY.totalScore} {formatPoints(self.cumulative_points)}
             </div>
           </div>
         )}
       </Scoreboard>
 
-      <SharedActions history={history} serverDate={serverDate}>
-        {self && hasRecord && !hasSleepBack && (
-          <button onClick={openSleepModal}>{COPY.sleepBackButton}</button>
-        )}
-      </SharedActions>
+      <div style={{ marginTop: 'clamp(14px, 3vh, 30px)', paddingTop: 'clamp(12px, 2vh, 20px)', borderTop: '1px solid var(--border)' }}>
+        <SharedActions history={history} serverDate={serverDate}>
+          {self && hasRecord && !hasSleepBack && (
+            <button className="btn-danger" onClick={openSleepModal} style={{ width: '100%', padding: 'clamp(12px, 1.8vh, 16px)', fontSize: 16, marginBottom: 'clamp(10px, 2vh, 18px)' }}>
+              {COPY.sleepBackButton}
+            </button>
+          )}
+        </SharedActions>
+      </div>
 
       <Modal
         open={showSleep}
@@ -105,25 +115,27 @@ export function Stage2({
         label={COPY.didYouSleepBack}
         dismissible={!pending}
       >
-        <h3>{title}</h3>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={() => setShowSleep(false)} disabled={pending}>
+        <h3 style={{ fontSize: 24, color: 'var(--danger)', marginBottom: 24 }}>{title}</h3>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 32 }}>
+          <button className="btn-ghost" onClick={() => setShowSleep(false)} disabled={pending}>
             {COPY.sleepBackNah}
           </button>
           <button
+            className="btn-danger"
             onClick={doSleepBack}
             disabled={pending}
-            style={{ background: 'crimson', color: '#fff', border: 'none', padding: '6px 12px' }}
           >
             {COPY.sleepBackYea}
           </button>
         </div>
-        {pending && <p aria-live="polite">...</p>}
-        {err && (
-          <p style={{ color: 'crimson' }} role="alert">
-            {err}
-          </p>
-        )}
+        <div style={{ minHeight: 24, marginTop: 16, textAlign: 'right' }}>
+          {pending && <p aria-live="polite" style={{ color: 'var(--text-muted)' }}>...</p>}
+          {err && (
+            <p style={{ color: 'var(--danger)', fontWeight: 600 }} role="alert">
+              {err}
+            </p>
+          )}
+        </div>
       </Modal>
     </div>
   );
