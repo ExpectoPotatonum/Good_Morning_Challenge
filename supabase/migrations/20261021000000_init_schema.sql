@@ -1,6 +1,12 @@
 -- Wake-Up Challenge schema
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Internal helper schema. Created first so the RPC migrations below can define
+-- functions inside it. Never exposed through the Data API.
+CREATE SCHEMA IF NOT EXISTS private;
+REVOKE ALL ON SCHEMA private FROM PUBLIC;
+GRANT USAGE ON SCHEMA private TO postgres;
+
 CREATE TABLE IF NOT EXISTS challenges (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL DEFAULT 'Wake-Up Challenge',

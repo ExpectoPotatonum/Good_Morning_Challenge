@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
 import { supabase } from './lib/supabase';
+import { AppContext } from './app-context';
 import type { DashboardResponse } from './types';
-
-interface AppCtx {
-  participantKey: string | null;
-  setParticipantKey: (k: string | null) => void;
-  dashboard: DashboardResponse | null;
-  loading: boolean;
-  refresh: () => Promise<void>;
-}
-
-const Ctx = createContext<AppCtx>({} as any);
 
 const LS_KEY = 'wmc_participant_key';
 
@@ -25,15 +17,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const setParticipantKey = (k: string | null) => {
+  const setParticipantKey = useCallback((k: string | null) => {
     try {
       if (k) localStorage.setItem(LS_KEY, k);
       else localStorage.removeItem(LS_KEY);
     } catch {}
     setParticipantKeyState(k);
-  };
+  }, []);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     if (!participantKey) {
       setDashboard(null);
       return;
@@ -46,21 +38,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       } else {
         setDashboard(data as any);
       }
-    } catch (e) {
+    } catch {
       setDashboard({ error: 'DATABASE_ERROR' } as any);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    refresh();
-    const onFocus = () => refresh();
-    window.addEventListener('focus', onFocus);
-    return () => window.removeEventListener('focus', onFocus);
   }, [participantKey]);
 
-  return <Ctx.Provider value={{ participantKey, setParticipantKey, dashboard, loading, refresh }}>{children}</Ctx.Provider>;
-}
+  useEffect(() => {
+    // Syncing with an external system (Supabase) on mount / participant change.
+    // oxlint-disable-next-line react/set-state-in-effect
+    void refresh();
+  }, [refresh]);
 
-export const useApp = () => useContext(Ctx);
+  // Refresh when the tab regains focus so a second device's write is picked up.
+  useEffect(() => {
+    const onFocus = () => {
+      void refresh();
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refresh]);
+
+  return (
+    <AppContext.Provider value={{ participantKey, setParticipantKey, dashboard, loading, refresh }}>
+      {children}
+    </AppContext.Provider>
+  );
+}

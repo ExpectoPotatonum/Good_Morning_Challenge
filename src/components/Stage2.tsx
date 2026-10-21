@@ -1,34 +1,56 @@
 import { useState } from 'react';
-import { useApp } from '../AppContext';
 import { COPY, pickOne, SLEEP_BACK_TITLES } from '../content/copy';
 import { supabase } from '../lib/supabase';
-import type { DashboardParticipant } from '../types';
+import { useApp } from '../useApp';
+import { Modal } from './Modal';
+import { Scoreboard } from './Scoreboard';
+import { SharedActions } from './SharedActions';
+import { formatChallengeTimestamp, formatPoints } from '../utils/format';
+import type { DashboardHistoryDate, DashboardParticipant } from '../types';
 
-export function Stage2({ participants, selected }: { participants: DashboardParticipant[]; selected: { participant_key: string; display_name: string } }) {
+export function Stage2({
+  participants,
+  selected,
+  history,
+  serverDate,
+}: {
+  participants: DashboardParticipant[];
+  selected: { participant_key: string; display_name: string };
+  history: DashboardHistoryDate[];
+  serverDate?: string;
+}) {
   const { refresh } = useApp();
   const self = participants.find((p) => p.participant_key === selected.participant_key);
-  const others = participants.filter((p) => p.participant_key !== selected.participant_key);
   const [showSleep, setShowSleep] = useState(false);
-  const [title] = useState(() => pickOne(SLEEP_BACK_TITLES));
+  const [title, setTitle] = useState('');
   const [pending, setPending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   const hasSleepBack = !!self?.today.sleep_back_at;
-  const hasRecord = self?.today.has_record;
+  const hasRecord = !!self?.today.has_record;
+
+  const openSleepModal = () => {
+    setTitle(pickOne(SLEEP_BACK_TITLES));
+    setErr(null);
+    setShowSleep(true);
+  };
 
   const doSleepBack = async () => {
     if (!selected.participant_key || pending || hasSleepBack) return;
     setPending(true);
     setErr(null);
     try {
-      const { data, error } = await supabase.rpc('mark_sleep_back_today', { p_participant_key: selected.participant_key });
+      const { data, error } = await supabase.rpc('mark_sleep_back_today', {
+        p_participant_key: selected.participant_key,
+      });
       if (error) {
-        setErr('DATABASE_ERROR');
+        setErr(error.message || 'DATABASE_ERROR');
         setPending(false);
         return;
       }
       const res = data as any;
       if (res?.code === 'SLEEP_BACK_ALREADY_MARKED') {
+        // Another device already applied it: refetch and render the persisted stage.
         await refresh();
         setPending(false);
         setShowSleep(false);
@@ -42,67 +64,61 @@ export function Stage2({ participants, selected }: { participants: DashboardPart
       }
       setErr(res?.code || 'DATABASE_ERROR');
       setPending(false);
-    } catch (e) {
-      setErr('DATABASE_ERROR');
+    } catch (e: any) {
+      setErr(e?.message || 'DATABASE_ERROR');
       setPending(false);
     }
   };
 
-  const fmtTime = (s?: string | null) => {
-    if (!s) return '';
-    return new Date(s).toLocaleString();
-  };
+  const when =
+    self?.today.entry_source === 'day_one_seed'
+      ? COPY.initialReportLabel
+      : formatChallengeTimestamp(self?.today.checked_in_at);
 
   return (
     <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui', padding: 16 }}>
-      <section style={{ marginBottom: 20 }}>
-        <h2>Scoreboard</h2>
-        {[self, ...others].filter(Boolean).map((p: any) => (
-          <div key={p.participant_key} style={{ margin: '6px 0' }}>
-            <strong>{p.display_name}</strong> — cumulative: {p.cumulative_points}
-            <div style={{ fontSize: 14 }}>
-              Today: {p.today.has_record ? (
-                <>
-                  {p.today.entry_source === 'day_one_seed' ? (
-                    <span>{COPY.initialReportLabel}</span>
-                  ) : (
-                    <span>{p.today.checked_in_at && fmtTime(p.today.checked_in_at)}</span>
-                  )}
-                  {' '}({p.today.wake_points} wake, {p.today.daily_net} net{p.today.sleep_back_at ? ', slept back' : ''})
-                </>
-              ) : 'Not checked in'}
-            </div>
-          </div>
-        ))}
-      </section>
+      <Scoreboard participants={participants} />
 
       {self && hasRecord && !hasSleepBack && (
         <section style={{ marginBottom: 20 }}>
           <div>
-            {COPY.todayCheckInAt}{' '}
-            {self.today.entry_source === 'day_one_seed' ? COPY.initialReportLabel : (self.today.checked_in_at && fmtTime(self.today.checked_in_at))}
+            {COPY.todayCheckInAt} {when}
           </div>
-          <div>wake: {self.today.wake_points}</div>
-          <button onClick={() => { setShowSleep(true); setErr(null); }}>{COPY.didYouSleepBack}</button>
+          <div>
+            {COPY.wakePoints}: {formatPoints(self.today.wake_points)}
+          </div>
+          <button onClick={openSleepModal}>{COPY.didYouSleepBack}</button>
         </section>
       )}
 
-      <section>
-        <button>{COPY.rules}</button>
-        <button style={{ marginLeft: 8 }}>{COPY.viewHistory}</button>
-      </section>
+      <SharedActions history={history} serverDate={serverDate} />
 
-      {showSleep && (
-        <dialog open style={{ border: 'none', borderRadius: 8, padding: 20, maxWidth: 360 }}>
-          <h3>{title}</h3>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <button onClick={() => setShowSleep(false)} disabled={pending}>{COPY.sleepBackNah}</button>
-            <button onClick={doSleepBack} disabled={pending} style={{ background: 'crimson', color: '#fff' }}>{COPY.sleepBackYea}</button>
-          </div>
-          {pending && <p>...</p>}
-          {err && <p style={{ color: 'crimson' }}>{err}</p>}
-        </dialog>
-      )}
+      <Modal
+        open={showSleep}
+        onClose={() => setShowSleep(false)}
+        label={COPY.didYouSleepBack}
+        dismissible={!pending}
+      >
+        <h3>{title}</h3>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <button onClick={() => setShowSleep(false)} disabled={pending}>
+            {COPY.sleepBackNah}
+          </button>
+          <button
+            onClick={doSleepBack}
+            disabled={pending}
+            style={{ background: 'crimson', color: '#fff', border: 'none', padding: '6px 12px' }}
+          >
+            {COPY.sleepBackYea}
+          </button>
+        </div>
+        {pending && <p aria-live="polite">...</p>}
+        {err && (
+          <p style={{ color: 'crimson' }} role="alert">
+            {err}
+          </p>
+        )}
+      </Modal>
     </div>
   );
 }

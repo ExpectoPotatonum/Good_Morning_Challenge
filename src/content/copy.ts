@@ -1,12 +1,29 @@
 export type Stage = 1 | 2 | 3;
 
-export const STAGE1_BUTTONS = [
-  'GOOD MOANING',
-  'GOOD MEOWING',
-  'GOOD MORNING',
-  'good morning',
-  '早上好中国，现在我有冰淇淋，我很喜欢冰淇淋',
-] as const;
+/**
+ * The two selectable participants. These must stay in sync with the
+ * `challenge_members` rows created by `supabase/migrations/20261021000001_seed_data.sql`.
+ * They are public labels, not credentials.
+ */
+export const PARTICIPANTS: ReadonlyArray<{ key: string; displayName: string }> = [
+  { key: 'player_1', displayName: 'Player 1' },
+  { key: 'player_2', displayName: 'Player 2' },
+];
+
+export type Stage1Variant = {
+  label: string;
+  /** Optional image-backed variant using an asset already in the repo. */
+  image?: 'zao';
+};
+
+export const STAGE1_BUTTONS: readonly Stage1Variant[] = [
+  { label: 'GOOD MOANING' },
+  { label: 'GOOD MEOWING' },
+  { label: 'GOOD MORNING' },
+  { label: 'good morning' },
+  { label: '早上好中国，现在我有冰淇淋，我很喜欢冰淇淋' },
+  { label: 'GOOD MORNING', image: 'zao' },
+];
 
 export const SLEEP_BACK_TITLES = [
   'Oh no reallyyyy?',
@@ -22,6 +39,25 @@ export const SLEEP_BACK_TITLES = [
   'today rly tired sia',
 ] as const;
 
+export const WAKE_POINT_TABLE: ReadonlyArray<{ window: string; points: number }> = [
+  { window: '00:00:00 – 06:30:59', points: 5 },
+  { window: '06:31:00 – 07:00:59', points: 4 },
+  { window: '07:01:00 – 07:30:59', points: 3 },
+  { window: '07:31:00 – 08:00:59', points: 2 },
+  { window: '08:01:00 – 08:30:59', points: 1 },
+  { window: '08:31:00 – 23:59:59', points: 0 },
+];
+
+export const RULES_BULLETS: readonly string[] = [
+  'Challenge dates: 21–31 October 2026 inclusive.',
+  'Official timezone: Asia/Kuala_Lumpur (UTC+08:00).',
+  'The server receives the official check-in time; points are based on that received timestamp.',
+  'Late check-in (08:31:00 or later) earns 0 wake points.',
+  'A confirmed sleep-back subtracts 1 from cumulative points, at most once per participant per date.',
+  'Cumulative scores may be negative.',
+  'The 21 October starting entries are initial reports for 08:01–08:30 and do not have exact timestamps.',
+];
+
 export const COPY = {
   stage1Helper: 'click below to check in for the day',
   notHavingGoodMorning: 'Not having a good morning? Click me',
@@ -34,10 +70,22 @@ export const COPY = {
   rules: 'rules',
   viewHistory: 'view history',
   challengeOver: 'Challenge over',
+  challengeNotStarted: 'Challenge not started yet',
   notCheckedIn: 'Not checked in',
   futureDash: '—',
   initialReportLabel: '08:01–08:30 — initial report',
   todayCheckInAt: "Today's check in at:",
+  scoreboard: 'Scoreboard',
+  cumulative: 'cumulative',
+  wakePoints: 'wake points',
+  dailyNet: 'daily net',
+  sleepBack: 'slept back',
+  noSleepBack: 'no sleep back',
+  pointsSuffix: 'pts',
+  lateSuffix: '— late',
+  close: 'Close',
+  pickPlayer: 'Select a participant',
+  pickPlayerHint: 'Anyone with the link can pick either player. This is not a login.',
 } as const;
 
 export function pickOne<T>(arr: readonly T[]): T {
