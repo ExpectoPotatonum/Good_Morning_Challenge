@@ -38,6 +38,41 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 Use the **publishable** key only. Never put a secret / service-role key in the
 frontend or in any `VITE_*` variable.
 
+### Try it without touching the database
+
+Local dev builds can swap the three RPCs for an in-memory fake, so you can play
+a whole day — including a real check-in — without a single write to Supabase:
+
+```
+http://localhost:5173/?demo=1      # on
+http://localhost:5173/?demo=0      # off (also sticky for the tab)
+```
+
+The flag is remembered for the tab. What you get:
+
+- a simulated **new day**, 22 October 2026 at 07:15 — no record yet, so the app
+  opens on **Stage 1** with the big check-in button;
+- the 21 October initial-report rows are present, exactly as seeded, so history
+  and totals (Jet 1, Bingsu 1) look real;
+- check-in, the `yay` flow, the sleep-back prompt and the Stage 2 → 3
+  transition all behave normally, still with zero network calls;
+- **reloading resets the day**, so you can replay it as many times as you like;
+- a `DEMO` badge in the bottom-left corner so it is never mistaken for the real
+  challenge.
+
+Overrides for the other states (add to `.env.local`):
+
+| Variable | Effect |
+|---|---|
+| `VITE_DEMO_MODE=1` | demo without the query flag |
+| `VITE_DEMO_DATE=2026-10-20` | challenge-not-started screen |
+| `VITE_DEMO_DATE=2026-11-01` | challenge-over screen with final totals |
+| `VITE_DEMO_TIME=06:20` | check in at 06:20 → 5 wake points |
+| `VITE_DEMO_TIME=14:00` | late check-in → `0 pts — late` |
+
+Demo mode requires `import.meta.env.DEV`, so it is inert in production builds;
+the fake lives in `src/lib/demo-db.ts` and is loaded on demand only.
+
 ## Supabase setup
 
 ### Hosted project
@@ -143,8 +178,9 @@ fluid spacing.
   small two-line `Switch player` pill pinned to the top right.
 - **Chooser** — `who r u` plus two equal-width participant buttons (`Jet`,
   `Bingsu`).
-- **Stage 1** — check-in only: the large randomized button (six variants, one
-  image-backed), the `Not having a good morning?` meowmeow modal, nothing else.
+- **Stage 1** — check-in only: the large randomized button (17 titles plus 5
+  image-backed artwork variants), the `Not having a good morning?` meowmeow
+  modal, nothing else.
 - **Stage 2** — scoreboard, the current participant's check-in panel (large
   timestamp, small `wake points` / `total score`), the sleep-back prompt, and
   `rules` / `view history` side by side.
