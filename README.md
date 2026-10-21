@@ -53,12 +53,14 @@ supabase db push
 | File | Purpose |
 |---|---|
 | `20261021000000_init_schema.sql` | `challenges`, `challenge_members`, `daily_check_ins`, constraints, and the internal `private` schema |
-| `20261021000001_seed_data.sql` | the challenge row, the two participants, and the 21 October initial-report rows |
+| `20261021000001_seed_data.sql` | the challenge row, the two participants (Jet/Bingsu), and the 21 October initial-report rows |
 | `20261021000002_rpc_get_dashboard.sql` | `get_dashboard(text)` |
 | `20261021000003_rpc_check_in.sql` | `check_in_today(text)` + private helper `private.private_check_in_at(text, timestamptz)` |
 | `20261021000004_rpc_sleep_back.sql` | `mark_sleep_back_today(text)` + private helper `private.private_mark_sleep_back_at(text, timestamptz)` |
 | `20261021000005_grants.sql` | table/function privileges: only the three RPCs are executable by `anon` |
 | `20261021000006_private_schema.sql` | idempotent safety net for the `private` schema |
+| `20261021000007_fix_dashboard_history.sql` | rebuilds `get_dashboard()` to return one entry per challenge date (11 entries) |
+| `20261021000008_participant_names.sql` | sets display names to `Jet` and `Bingsu` (keys remain `player_1`/`player_2`) |
 
 > **Ordering matters.** `private` is created in the *first* migration because
 > the RPC migrations define functions inside it. If you previously applied the
@@ -73,12 +75,10 @@ supabase db push
 >
 > All four are idempotent, so re-running them does not duplicate data.
 
-### Pending migration on the live project
+### Applied repair migrations
 
-`20261021000007_fix_dashboard_history.sql` rebuilds `get_dashboard()` so the
-history contains one entry per challenge date (11 entries) instead of one
-entry per participant. Apply it with `supabase db push`, or paste the file
-into the Dashboard → SQL Editor. `CREATE OR REPLACE` makes it safe to re-run.
+`20261021000007` and `20261021000008` have already been applied to the live
+project. `supabase db push` applies them in filename order on a fresh database.
 
 ### Local Supabase (optional)
 
