@@ -8,7 +8,7 @@
 2. Implement the Supabase SQL schema/RPCs and seed data first. Do not add Supabase Auth, passwords, OTP, RLS policies, membership helpers, or an authentication/privilege audit framework.
 3. Keep official timestamps, scoring and daily uniqueness in PostgreSQL. The browser must not submit its own timestamp/date/points or calculate persisted official scores.
 4. Keep the two participants selectable by public username. Remember the selected participant key in local storage and provide a simple `Switch player` action. This is not authentication; either username can be impersonated by anyone with the URL.
-5. Seed both 21 October 2026 initial-report rows at 1 point each before testing the UI. Preserve null exact timestamp and display `08:01–08:30 — initial report`.
+5. Seed both 21 October 2026 initial-report rows at 1 point each before testing the UI. Preserve null exact timestamp and display `08:01–08:30`.
 6. Implement `get_dashboard()`, `check_in_today()` and `mark_sleep_back_today()` as described in `ARCHITECTURE.MD`. Use stable error codes and refresh persisted dashboard state after writes/conflicts.
 7. Put all UI strings and randomized variants in `src/content/copy.ts`. The main `GOOD MOANING` button and modal `yay` must invoke the same check-in action.
 8. Implement stages exactly: Stage 1 is check-in experience only; Stage 2 is shared scoreboard/rules/history plus own status and sleep-back prompt; Stage 3 follows a successful penalty and hides the personal status/prompt but retains the shared scoreboard.

@@ -1,48 +1,34 @@
+import type { ReactNode } from 'react';
 import { COPY } from '../content/copy';
-import { formatChallengeTimestamp, formatPoints } from '../utils/format';
+import { formatRecordSummary } from '../utils/format';
 import type { DashboardParticipant } from '../types';
-
-/** Today's record for one participant, shared by the scoreboard and history. */
-export function RecordSummary({ participant }: { participant: DashboardParticipant }) {
-  const today = participant.today;
-  if (!today.has_record) {
-    return <span style={{ color: '#888' }}>{COPY.notCheckedIn}</span>;
-  }
-
-  const when =
-    today.entry_source === 'day_one_seed'
-      ? COPY.initialReportLabel
-      : formatChallengeTimestamp(today.checked_in_at);
-
-  return (
-    <span>
-      {when}
-      {' · '}
-      {formatPoints(today.wake_points)} {COPY.wakePoints}
-      {' · '}
-      {COPY.dailyNet} {today.daily_net}
-      {today.sleep_back_at ? ` · ${COPY.sleepBack}` : ''}
-    </span>
-  );
-}
 
 /**
  * Shared two-person scoreboard. Visible from Stage 2 onward and in the
  * challenge-over view. Shows cumulative points plus each participant's
  * today's check-in time / reported window.
+ *
+ * `children` renders between the heading and the rows: Stage 2 uses it for the
+ * selected participant's status lines.
  */
-export function Scoreboard({ participants }: { participants: DashboardParticipant[] }) {
+export function Scoreboard({
+  participants,
+  children,
+}: {
+  participants: DashboardParticipant[];
+  children?: ReactNode;
+}) {
   return (
     <section style={{ marginBottom: 20 }}>
       <h2>{COPY.scoreboard}</h2>
+      {children}
       {participants.map((p) => (
         <div key={p.participant_key} style={{ margin: '8px 0' }}>
-          <div>
-            <strong>{p.display_name}</strong> — {COPY.cumulative}:{' '}
-            <strong>{p.cumulative_points}</strong>
+          <div style={{ fontWeight: 600 }}>
+            {`${p.display_name} ${COPY.totalPts} ${p.cumulative_points}`}
           </div>
-          <div style={{ fontSize: 14 }}>
-            Today: <RecordSummary participant={p} />
+          <div style={{ fontSize: 14, color: p.today.has_record ? undefined : '#888' }}>
+            {`${COPY.today} ${formatRecordSummary(p)}`}
           </div>
         </div>
       ))}

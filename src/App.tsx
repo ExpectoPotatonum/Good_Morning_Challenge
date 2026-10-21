@@ -6,6 +6,7 @@ import { Stage3 } from './components/Stage3';
 import { Scoreboard } from './components/Scoreboard';
 import { SharedActions } from './components/SharedActions';
 import { COPY } from './content/copy';
+import { CHALLENGE_UTC_LABEL } from './utils/format';
 
 function Main() {
   const { participantKey, setParticipantKey, dashboard, loading, refresh } = useApp();
@@ -62,7 +63,7 @@ function Main() {
         {switchPlayer}
         <h1>{COPY.challengeNotStarted}</h1>
         <p>
-          21–31 October 2026 · {dashboard.challenge?.timezone}
+          21–31 October 2026 · {CHALLENGE_UTC_LABEL}
         </p>
         <SharedActions history={history} serverDate={serverDate} />
       </div>

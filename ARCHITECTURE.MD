@@ -123,12 +123,12 @@ Seed exactly one row for each configured participant with:
 - `wake_points = 1`
 - `sleep_back_at = NULL`
 
-Display it as `08:01–08:30 — initial report`. Do not invent a check-in time. The sleep-back operation must find the row using participant key and challenge date even though `checked_in_at` is null.
+Display it as `08:01–08:30`. Do not invent a check-in time. The sleep-back operation must find the row using participant key and challenge date even though `checked_in_at` is null.
 
 Implementation/launch order:
 
 1. Apply version-controlled SQL migrations.
-2. Configure the two fixed participant keys and display names in the participants table/seed configuration (use clear temporary defaults such as `player_1` / `Player 1` and `player_2` / `Player 2` if names are not available yet).
+2. Configure the two fixed participant keys and display names in the participants table/seed configuration. The configured participants are `player_1` / `Jet` and `player_2` / `Bingsu` (see `supabase/migrations/20261021000008_participant_names.sql`); the keys are internal identifiers and the display names are what the app shows.
 3. Seed/verify both 21 October initial-report rows. The seed script must be idempotent or fail clearly without overwriting an existing row.
 4. Verify the dashboard shows 1 point each and the initial-report label.
 5. Build and deploy to Netlify, then share the URL.
@@ -269,10 +269,16 @@ Show only the check-in experience: do **not** show the scoreboard, rules or hist
 
 Show the shared scoreboard, rules access, and history access, plus the current selected participant's check-in/status panel and sleep-back prompt.
 
-- Show `Today's check in at: {timestamp}` for live check-ins; include seconds and make the timezone clear (e.g. `Asia/Kuala_Lumpur`).
-- For the seeded row show exactly `Today's check in at: 08:01–08:30 — initial report`, with no invented timestamp.
-- Show the saved wake-point award for this participant.
-- Show the `did you sleep back?` button.
+The screen order is fixed:
+
+1. `Scoreboard` heading.
+2. The selected participant's three status lines: `You checked in today at: {timestamp}`, `wake points: {n} pt`, `total score: {n} pt`.
+3. One two-line block per participant: `{name} total pts: {cumulative}` and `Today: {timestamp or reported window} ({n} wake points)`. Append `· slept back` when that participant has a confirmed penalty.
+4. The action buttons, each on its own line: `(did u slp back?)`, `(rules)`, `(view history)`.
+
+- Show `You checked in today at: {timestamp}` for live check-ins; include seconds and make the timezone clear (e.g. `UTC+8`).
+- For the seeded row show exactly `You checked in today at: 08:01–08:30`, with no invented timestamp.
+- Show the `(did u slp back?)` button.
 - Clicking it opens a modal with one randomly selected title per modal opening (not on every render):
   - `Oh no reallyyyy?`
   - `oh no reallyyy?`
@@ -293,9 +299,9 @@ Show the shared scoreboard, rules access, and history access, plus the current s
 
 ### Rules and history content (visible from Stage 2 onward)
 
-Provide a `rules` control that opens a modal or panel containing:
+Provide a `(rules)` control that opens a modal or panel containing:
 
-- Challenge dates: 21–31 October 2026 inclusive; official timezone `Asia/Kuala_Lumpur` (UTC+08:00).
+- Challenge dates: 21–31 October 2026 inclusive; official timezone `UTC+8` (the challenge runs on `Asia/Kuala_Lumpur`, a fixed UTC+08:00 offset with no daylight saving).
 - The full wake-point table from §3, including exact second boundaries and the 5-point cap.
 - The server receives the official check-in time; points are based on that received timestamp.
 - Late check-in (08:31:00 or later) earns 0 wake points.
@@ -306,7 +312,7 @@ Provide a `rules` control that opens a modal or panel containing:
 
 - Show both participants' cumulative points and each participant's check-in time/reported window for today.
 - Keep the rules control reachable.
-- Show `view history` beneath the scoreboard. Open a modal or use `#history`; render 11 date rows with both participants' time/report, base wake points, sleep-back status and daily net points.
+- Show `(view history)` beneath the scoreboard. Open a modal or use `#history`; render 11 date rows with both participants' time/report, base wake points, sleep-back status and daily net points.
 - For a missing past/current record, show `Not checked in`. For future dates, show `—`.
 - Stage 3 hides the Stage 2 personal status/prompt panel; it does not hide the two-person scoreboard or today's per-person wake-time display.
 

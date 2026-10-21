@@ -1,6 +1,6 @@
 import { Modal } from './Modal';
 import { COPY, RULES_BULLETS, WAKE_POINT_TABLE } from '../content/copy';
-import { CHALLENGE_TIMEZONE } from '../utils/format';
+import { CHALLENGE_UTC_LABEL } from '../utils/format';
 
 export function RulesModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
@@ -16,7 +16,7 @@ export function RulesModal({ open, onClose }: { open: boolean; onClose: () => vo
         <thead>
           <tr>
             <th style={{ textAlign: 'left', padding: '4px 10px', borderBottom: '1px solid #ccc' }}>
-              Local time ({CHALLENGE_TIMEZONE})
+              Local time ({CHALLENGE_UTC_LABEL})
             </th>
             <th style={{ padding: '4px 10px', borderBottom: '1px solid #ccc' }}>Wake points</th>
           </tr>

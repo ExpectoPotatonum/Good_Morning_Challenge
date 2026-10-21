@@ -2,12 +2,13 @@ export type Stage = 1 | 2 | 3;
 
 /**
  * The two selectable participants. These must stay in sync with the
- * `challenge_members` rows created by `supabase/migrations/20261021000001_seed_data.sql`.
+ * `challenge_members` rows created by `supabase/migrations/20261021000001_seed_data.sql`
+ * (see `20261021000008_participant_names.sql` for the display names).
  * They are public labels, not credentials.
  */
 export const PARTICIPANTS: ReadonlyArray<{ key: string; displayName: string }> = [
-  { key: 'player_1', displayName: 'Player 1' },
-  { key: 'player_2', displayName: 'Player 2' },
+  { key: 'player_1', displayName: 'Jet' },
+  { key: 'player_2', displayName: 'Bingsu' },
 ];
 
 export type Stage1Variant = {
@@ -50,7 +51,7 @@ export const WAKE_POINT_TABLE: ReadonlyArray<{ window: string; points: number }>
 
 export const RULES_BULLETS: readonly string[] = [
   'Challenge dates: 21–31 October 2026 inclusive.',
-  'Official timezone: Asia/Kuala_Lumpur (UTC+08:00).',
+  'Official timezone: UTC+8.',
   'The server receives the official check-in time; points are based on that received timestamp.',
   'Late check-in (08:31:00 or later) earns 0 wake points.',
   'A confirmed sleep-back subtracts 1 from cumulative points, at most once per participant per date.',
@@ -64,28 +65,32 @@ export const COPY = {
   meowBlessing: ':ur blessed by meowmeow, now GOOD MORNING to you',
   yay: 'yay',
   switchPlayer: 'Switch player',
-  didYouSleepBack: 'did you sleep back?',
+  didYouSleepBack: 'did u slp back?',
+  sleepBackButton: '(did u slp back?)',
   sleepBackYea: 'Yea ig...',
   sleepBackNah: 'NAH JK i click for fun',
   rules: 'rules',
+  rulesButton: '(rules)',
   viewHistory: 'view history',
+  viewHistoryButton: '(view history)',
   challengeOver: 'Challenge over',
   challengeNotStarted: 'Challenge not started yet',
   notCheckedIn: 'Not checked in',
   futureDash: '—',
-  initialReportLabel: '08:01–08:30 — initial report',
-  todayCheckInAt: "Today's check in at:",
+  initialReportLabel: '08:01–08:30',
+  youCheckedInTodayAt: 'You checked in today at:',
+  wakePointsLine: 'wake points:',
+  totalScore: 'total score:',
+  totalPts: 'total pts:',
+  today: 'Today:',
   scoreboard: 'Scoreboard',
-  cumulative: 'cumulative',
   wakePoints: 'wake points',
-  dailyNet: 'daily net',
   sleepBack: 'slept back',
   noSleepBack: 'no sleep back',
   pointsSuffix: 'pts',
   lateSuffix: '— late',
   close: 'Close',
   pickPlayer: 'who r u',
-  pickPlayerHint: 'Anyone with the link can pick either player. This is not a login.',
 } as const;
 
 export function pickOne<T>(arr: readonly T[]): T {

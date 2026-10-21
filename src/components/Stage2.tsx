@@ -77,21 +77,27 @@ export function Stage2({
 
   return (
     <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui', padding: 16 }}>
-      <Scoreboard participants={participants} />
-
-      {self && hasRecord && !hasSleepBack && (
-        <section style={{ marginBottom: 20 }}>
-          <div>
-            {COPY.todayCheckInAt} {when}
+      <Scoreboard participants={participants}>
+        {self && hasRecord && (
+          <div style={{ marginBottom: 12 }}>
+            <div>
+              {COPY.youCheckedInTodayAt} {when}
+            </div>
+            <div>
+              {COPY.wakePointsLine} {formatPoints(self.today.wake_points)}
+            </div>
+            <div>
+              {COPY.totalScore} {formatPoints(self.cumulative_points)}
+            </div>
           </div>
-          <div>
-            {COPY.wakePoints}: {formatPoints(self.today.wake_points)}
-          </div>
-          <button onClick={openSleepModal}>{COPY.didYouSleepBack}</button>
-        </section>
-      )}
+        )}
+      </Scoreboard>
 
-      <SharedActions history={history} serverDate={serverDate} />
+      <SharedActions history={history} serverDate={serverDate}>
+        {self && hasRecord && !hasSleepBack && (
+          <button onClick={openSleepModal}>{COPY.sleepBackButton}</button>
+        )}
+      </SharedActions>
 
       <Modal
         open={showSleep}

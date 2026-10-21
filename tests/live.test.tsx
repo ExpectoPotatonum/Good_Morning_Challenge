@@ -29,14 +29,14 @@ suite('live database', () => {
       </AppProvider>,
     );
 
-    // Player 1 is checked in for today (21 October seed row), so the app is
+    // Jet is checked in for today (21 October seed row), so the app is
     // in Stage 2: shared scoreboard + personal status.
     await waitFor(() => expect(screen.getByText(COPY.scoreboard)).toBeTruthy(), { timeout: 15000 });
 
-    expect(screen.getByText('Player 1')).toBeTruthy();
-    expect(screen.getByText('Player 2')).toBeTruthy();
-    expect(screen.getByText(COPY.didYouSleepBack)).toBeTruthy();
-    expect(screen.getAllByText(/08:01–08:30 — initial report/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/^Jet total pts:/)).toBeTruthy();
+    expect(screen.getByText(/^Bingsu total pts:/)).toBeTruthy();
+    expect(screen.getByText(COPY.sleepBackButton)).toBeTruthy();
+    expect(screen.getAllByText(/08:01–08:30/).length).toBeGreaterThan(0);
   });
 
   it('shows one history entry per challenge date', async () => {
@@ -47,7 +47,7 @@ suite('live database', () => {
     );
 
     await waitFor(() => expect(screen.getByText(COPY.scoreboard)).toBeTruthy(), { timeout: 15000 });
-    await userEvent.click(screen.getByRole('button', { name: COPY.viewHistory }));
+    await userEvent.click(screen.getByRole('button', { name: COPY.viewHistoryButton }));
 
     // 21 - 31 October 2026 inclusive.
     expect(screen.getAllByText('21 Oct 2026').length).toBeGreaterThan(0);

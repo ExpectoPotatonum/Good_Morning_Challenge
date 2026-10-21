@@ -5,8 +5,8 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO challenge_members (participant_key, challenge_id, display_name, sort_order)
 VALUES
-  ('player_1', '00000000-0000-0000-0000-000000000001', 'Player 1', 1),
-  ('player_2', '00000000-0000-0000-0000-000000000001', 'Player 2', 2)
+  ('player_1', '00000000-0000-0000-0000-000000000001', 'Jet', 1),
+  ('player_2', '00000000-0000-0000-0000-000000000001', 'Bingsu', 2)
 ON CONFLICT (participant_key) DO NOTHING;
 
 -- Seed initial report rows for 21 Oct 2026 (idempotent)

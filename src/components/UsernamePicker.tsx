@@ -15,7 +15,6 @@ export function UsernamePicker() {
           </button>
         ))}
       </div>
-      <p style={{ color: '#666', marginTop: 16, fontSize: 14 }}>{COPY.pickPlayerHint}</p>
     </div>
   );
 }

@@ -1,4 +1,14 @@
+import { COPY } from '../content/copy';
+import type { DashboardParticipant } from '../types';
+
+/** Canonical timezone used for scoring and for every displayed timestamp. */
 export const CHALLENGE_TIMEZONE = 'Asia/Kuala_Lumpur';
+
+/**
+ * Label shown next to a timestamp. The canonical timezone is a fixed UTC+08:00
+ * offset with no daylight saving, so the short label is enough for the UI.
+ */
+export const CHALLENGE_UTC_LABEL = 'UTC+8';
 
 const MONTHS = [
   'Jan',
@@ -18,7 +28,8 @@ const MONTHS = [
 /**
  * Format a server timestamp in the canonical challenge timezone.
  * Official scoring never uses the browser clock or browser timezone, so every
- * displayed timestamp is rendered explicitly in Asia/Kuala_Lumpur with seconds.
+ * displayed timestamp is rendered explicitly in the challenge timezone with
+ * seconds and a short `UTC+8` label.
  */
 export function formatChallengeTimestamp(iso: string | null | undefined): string {
   if (!iso) return '';
@@ -37,7 +48,7 @@ export function formatChallengeTimestamp(iso: string | null | undefined): string
     second: '2-digit',
     hourCycle: 'h23',
   }).format(d);
-  return `${date}, ${time} (${CHALLENGE_TIMEZONE})`;
+  return `${date}, ${time} ${CHALLENGE_UTC_LABEL}`;
 }
 
 /** Format a plain `YYYY-MM-DD` challenge date without timezone shifting. */
@@ -61,4 +72,24 @@ export function formatPoints(points: number | undefined | null): string {
 /** Award feedback, e.g. `4 pts` or `0 pts — late`. */
 export function formatAward(points: number): string {
   return points === 0 ? '0 pts — late' : formatPoints(points);
+}
+
+/**
+ * Today's record for one participant as a single line of text:
+ * `08:01–08:30 — initial report (1 wake points)`.
+ *
+ * Seeded rows keep their reported window (there is no exact timestamp to
+ * show); live rows show the exact server timestamp.
+ */
+export function formatRecordSummary(participant: DashboardParticipant): string {
+  const today = participant.today;
+  if (!today.has_record) return COPY.notCheckedIn;
+
+  const when =
+    today.entry_source === 'day_one_seed'
+      ? COPY.initialReportLabel
+      : formatChallengeTimestamp(today.checked_in_at);
+
+  const base = `${when} (${today.wake_points} ${COPY.wakePoints})`;
+  return today.sleep_back_at ? `${base} · ${COPY.sleepBack}` : base;
 }

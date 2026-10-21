@@ -1,6 +1,7 @@
 import { COPY, PARTICIPANTS, pickOne, SLEEP_BACK_TITLES, STAGE1_BUTTONS, WAKE_POINT_TABLE } from '../src/content/copy';
 import {
   CHALLENGE_TIMEZONE,
+  CHALLENGE_UTC_LABEL,
   formatAward,
   formatChallengeDate,
   formatChallengeTimestamp,
@@ -32,15 +33,19 @@ describe('copy variants', () => {
     expect(COPY.yay).toBe('yay');
     expect(COPY.sleepBackYea).toBe('Yea ig...');
     expect(COPY.sleepBackNah).toBe('NAH JK i click for fun');
-    expect(COPY.didYouSleepBack).toBe('did you sleep back?');
+    expect(COPY.didYouSleepBack).toBe('did u slp back?');
+    expect(COPY.sleepBackButton).toBe('(did u slp back?)');
+    expect(COPY.rulesButton).toBe('(rules)');
+    expect(COPY.viewHistoryButton).toBe('(view history)');
     expect(COPY.switchPlayer).toBe('Switch player');
-    expect(COPY.initialReportLabel).toBe('08:01–08:30 — initial report');
+    expect(COPY.initialReportLabel).toBe('08:01–08:30');
     expect(COPY.challengeOver).toBe('Challenge over');
   });
 
   it('exactly two participants are selectable', () => {
     expect(PARTICIPANTS).toHaveLength(2);
     expect(PARTICIPANTS.map((p) => p.key)).toEqual(['player_1', 'player_2']);
+    expect(PARTICIPANTS.map((p) => p.displayName)).toEqual(['Jet', 'Bingsu']);
   });
 
   it('pickOne always returns a member of the list', () => {
@@ -64,13 +69,18 @@ describe('wake point table', () => {
 });
 
 describe('challenge-local formatting', () => {
-  it('formats timestamps in Asia/Kuala_Lumpur with seconds and the timezone', () => {
+  it('formats timestamps in the challenge timezone with seconds and a UTC+8 label', () => {
     expect(formatChallengeTimestamp('2026-10-21T00:00:00Z')).toBe(
-      `21 Oct 2026, 08:00:00 (${CHALLENGE_TIMEZONE})`,
+      `21 Oct 2026, 08:00:00 ${CHALLENGE_UTC_LABEL}`,
     );
     expect(formatChallengeTimestamp('2026-10-21T23:15:07Z')).toBe(
-      `22 Oct 2026, 07:15:07 (${CHALLENGE_TIMEZONE})`,
+      `22 Oct 2026, 07:15:07 ${CHALLENGE_UTC_LABEL}`,
     );
+    expect(CHALLENGE_UTC_LABEL).toBe('UTC+8');
+    expect(CHALLENGE_UTC_LABEL).not.toContain('Kuala');
+    // Scoring still runs in the canonical zone; only the label shown to users
+    // is shortened.
+    expect(CHALLENGE_TIMEZONE).toBe('Asia/Kuala_Lumpur');
   });
 
   it('renders the same instant the same way regardless of the browser timezone', () => {
