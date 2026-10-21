@@ -1,4 +1,4 @@
-# Wake-Up Challenge
+# Good Morning Challenge
 
 A small, trust-based wake-up challenge app for two people, 21–31 October 2026.
 Each participant picks a public username (no password, no verification), taps a
@@ -133,6 +133,34 @@ execute the three public RPCs and **not** the two `private` helpers.
 - The 21 October rows are *initial reports* for 08:01–08:30 and have no exact
   timestamp. They can still receive a sleep-back penalty.
 
+## Interface
+
+The UI is the user's "Dawn & Dusk" redesign, recorded in `DESIGN.md`:
+a frosted glass card over a warm gradient, rounded corners, soft shadows and
+fluid spacing.
+
+- **Persistent header** in every state — `Good Morning Challenge` centred, with a
+  small two-line `Switch player` pill pinned to the top right.
+- **Chooser** — `who r u` plus two equal-width participant buttons (`Jet`,
+  `Bingsu`).
+- **Stage 1** — check-in only: the large randomized button (six variants, one
+  image-backed), the `Not having a good morning?` meowmeow modal, nothing else.
+- **Stage 2** — scoreboard, the current participant's check-in panel (large
+  timestamp, small `wake points` / `total score`), the sleep-back prompt, and
+  `rules` / `view history` side by side.
+- **Stage 3** — the same shared content without the personal panel.
+- **History modal** — only the table scrolls, its heading row is sticky, and the
+  `×` at the top right closes it without scrolling to the bottom.
+
+Every state fits one portrait phone screen without vertical scrolling from
+375×667 upward (verified at 390×844, 375×667, 360×740, 414×896 and 768×1024),
+with no horizontal overflow down to 320px. Spacing scales with viewport height
+through `clamp()`, and the card is centred in the space below the header. The
+320×568 original iPhone SE is the only size that still scrolls.
+
+All UI strings, column headings and randomized variants live in
+`src/content/copy.ts`.
+
 ## Testing
 
 ```bash
@@ -211,11 +239,15 @@ disable scanning.
 
 ```
 src/
-  components/     Stage1 / Stage2 / Stage3, Modal, Scoreboard, rules + history modals
-  content/copy.ts every UI string and random variant
-  utils/          scoring helpers, challenge-local time formatting
+  App.tsx           stage derivation + persistent header
+  components/       UsernamePicker, Stage1/2/3, Scoreboard, SharedActions,
+                    Modal, RulesModal, HistoryModal
+  content/copy.ts   every UI string, column heading and random variant
+  index.css         the Dawn & Dusk theme, layout and responsive spacing
+  utils/            scoring helpers, challenge-local time formatting
 supabase/
-  migrations/     schema, seed, the three RPCs, grants
-tests/            unit, UI and database integration tests
-ARCHITECTURE.MD   canonical product specification
+  migrations/       schema, seed, the three RPCs, grants
+tests/              unit, UI and database integration tests
+ARCHITECTURE.MD     canonical product specification
+UI_CODEBASE_DUMP.md reference source for the current visual design
 ```

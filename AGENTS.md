@@ -26,3 +26,11 @@
 - Use `VITE_SUPABASE_PUBLISHABLE_KEY` and `VITE_SUPABASE_URL`; never put a secret/service-role key in browser code.
 - Do not add authentication or claim username selection is secure. The user explicitly accepts that anyone with the URL can act as either participant.
 - Do not finalize additional visual styling before the user reviews the functional UI.
+
+## Interface conventions
+
+- Every state renders the persistent header: `Good Morning Challenge` centred, with a small two-line `Switch player` pill at the top right. Never repeat the product name inside the card.
+- Stages 1–3 (header included) must fit one portrait phone screen without vertical scrolling from 375×667 up, and never overflow horizontally down to 320px. Scale spacing with `clamp()`/viewport height instead of pinning it tight.
+- The history modal scrolls only its table, keeps the heading row sticky, and offers a top-right `×` so it closes without scrolling to the bottom.
+- Keep every UI string, column heading and modal label in `src/content/copy.ts` — no literal copy in components.
+- `DESIGN.md` is the applied visual reference; `ARCHITECTURE.MD` stays the behavioural source of truth.

@@ -1,6 +1,6 @@
-# Wake-Up Challenge — Architecture and Product Specification
+# Good Morning Challenge — Architecture and Product Specification
 
-**Status:** Product behavior and implementation choices are confirmed. Begin implementation. Visual styling can be refined after the first working build.
+**Status:** Product behavior, implementation choices and the "Dawn & Dusk" visual design (`DESIGN.md`) are confirmed and implemented. Visual styling may still be tuned after review.
 
 **Challenge period:** 21 October 2026 through 31 October 2026 inclusive (11 challenge dates).
 
@@ -243,9 +243,22 @@ Disable each submitting button while a request is pending. On double-click or a 
 
 Use the selected username plus `get_dashboard()` to derive the stage. Persisted database state is authoritative after reload or opening another device; the remembered local-storage selection only chooses which participant to display/actions to send as.
 
+### Persistent page header
+
+Every state — chooser, Stage 1, Stage 2, Stage 3, before-start and challenge-over — renders the same header above the content:
+
+- The product name `Good Morning Challenge` is the page title, horizontally centred on the screen.
+- The `Switch player` control is a deliberately small pill pinned to the top-right of the same row; its label may wrap onto two lines inside the pill.
+- The title and the control must stay on one row. When space is tight the title font shrinks (`clamp()`), never the control's placement.
+- The product name appears in the header only; never repeat it inside the card.
+
 ### Username chooser
 
 On first load, choose one of the two preconfigured participant display names. Remember the selected `participant_key` in local storage. Provide a simple `Switch player` action so the other participant can select themselves on a shared device. Do not ask for a password, email, OTP or verification. This is a selector, not an authentication screen. After selection, follow the stage determined by the saved daily row.
+
+- Prompt: `who r u`, large and high contrast, centred in the card.
+- The two participant buttons (`Jet`, `Bingsu`) are equal width and height, side by side.
+- The `Switch player` control is not shown until a participant is selected.
 
 ### Stage 1 — not yet checked in today
 
@@ -274,10 +287,11 @@ The screen order is fixed:
 1. `Scoreboard` heading.
 2. The selected participant's three status lines: `You checked in today at: {timestamp}`, `wake points: {n} pt`, `total score: {n} pt`.
 3. One two-line block per participant: `{name} total pts: {cumulative}` and `Today: {timestamp or reported window} ({n} wake points)`. Append `· slept back` when that participant has a confirmed penalty.
-4. The action buttons, each on its own line: `did u slp back?`, `rules`, `view history`.
+4. The action buttons: `did u slp back?` on its own full-width line, then `rules` and `view history` side by side at equal width.
 
 - Show `You checked in today at: {timestamp}` for live check-ins; include seconds and make the timezone clear (e.g. `UTC+8`).
 - For the seeded row show exactly `You checked in today at: 08:01–08:30`, with no invented timestamp.
+- The check-in line is the visual focus of the panel: larger, bold and high contrast. The `wake points` and `total score` lines are supporting detail — smaller and muted.
 - Show the `did u slp back?` button.
 - Clicking it opens a modal with one randomly selected title per modal opening (not on every render):
   - `Oh no reallyyyy?`
@@ -313,6 +327,7 @@ Provide a `rules` control that opens a modal or panel containing:
 - Show both participants' cumulative points and each participant's check-in time/reported window for today.
 - Keep the rules control reachable.
 - Show `view history` beneath the scoreboard. Open a modal or use `#history`; render 11 date rows with both participants' time/report, base wake points, sleep-back status and daily net points.
+- The history table scrolls inside the modal rather than the modal itself, so its column headings are `position: sticky` and the `Close` cross at the top-right stays visible without scrolling to the bottom. Keep the bottom `Close` button as well.
 - For a missing past/current record, show `Not checked in`. For future dates, show `—`.
 - Stage 3 hides the Stage 2 personal status/prompt panel; it does not hide the two-person scoreboard or today's per-person wake-time display.
 
@@ -322,11 +337,13 @@ When the server challenge-local date is after 31 October 2026, show `Challenge o
 
 ### Shared UI behavior
 
-- Use a `Switch player` control instead of sign-out.
-- Keep button/modal copy in `src/content/copy.ts`; random selections stay stable for one stage entry or one modal opening.
+- Use a `Switch player` control instead of sign-out, inside the persistent page header.
+- Keep **every** UI string, column heading and modal label in `src/content/copy.ts`; no literal copy in components. Random selections stay stable for one stage entry or one modal opening.
+- Fit the whole state on one portrait phone screen: Stage 1, Stage 2 (including the header and `Switch player`) and Stage 3 must not require vertical scrolling from 375×667 upward. Use viewport-height-relative `clamp()` spacing so tall screens get more air, and centre the card in the space under the header instead of leaving all slack at the bottom.
+- Never introduce horizontal scrolling at any width down to 320px.
 - Use accessible dialogs, distinct confirm/cancel styles, disable buttons during requests, preserve modal state on failure, and show recoverable errors.
 - Use the existing images already in the app repository. Inspect the repository for their current names and paths; do not ask the user for them or substitute unrelated pictures.
-- Visual styling details are intentionally left for the user's UI review; implement the specified hierarchy, buttons and stages first.
+- The visual design follows `DESIGN.md`; keep the specified hierarchy and do not reintroduce inline copy.
 
 ## 9. Testing and acceptance criteria
 
@@ -408,4 +425,5 @@ Test at least these local times:
 - Username-only participant selection, with no password or verification, is explicitly chosen. Anyone with the URL can select either participant and impersonate them. This app is suitable only for a trusted casual challenge.
 - One sleep-back penalty maximum per participant/day; cumulative totals may be negative.
 - The images are already in the application repository; the coding agent must inspect and use them.
-- Visual styling can be refined after the first functional build.
+- The visual design is the user-supplied "Dawn & Dusk" treatment recorded in `DESIGN.md`: glass card over a warm gradient, rounded corners, soft shadows, fluid spacing.
+- The product name is `Good Morning Challenge`; it lives in the persistent page header and in the document title.
