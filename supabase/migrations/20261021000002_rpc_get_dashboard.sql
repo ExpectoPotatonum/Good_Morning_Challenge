@@ -98,55 +98,50 @@ BEGIN
   LEFT JOIN today_rows t ON t.participant_key = m.participant_key
   LEFT JOIN cum c ON c.participant_key = m.participant_key;
 
-  -- build history (all 11 dates from starts_on to ends_on)
+  -- build history: every challenge date from starts_on to ends_on, both participants.
+  -- A LATERAL join per date keeps one history entry per date (no GROUP BY needed)
+  -- and always lists both participants for that date.
   WITH dates AS (
-    SELECT generate_series(v_starts_on, v_ends_on, '1 day'::interval)::date AS d
-    ORDER BY d
-  ),
-  all_pairs AS (
-    SELECT m.participant_key, m.display_name, m.sort_order, dt.d AS challenge_date
-    FROM public.challenge_members m
-    CROSS JOIN dates dt
-    WHERE m.challenge_id = v_challenge_id
-  ),
-  recs AS (
-    SELECT d.participant_key, d.challenge_date, d.entry_source, d.checked_in_at, d.reported_wake_window, d.wake_points, d.sleep_back_at
-    FROM public.daily_check_ins d
-    WHERE d.challenge_id = v_challenge_id
+    SELECT generate_series(v_starts_on::timestamp, v_ends_on::timestamp, '1 day'::interval)::date AS d
   )
-  SELECT jsonb_agg(
-           jsonb_build_object(
-             'date', ap.challenge_date,
-             'rows', (
-               SELECT jsonb_agg(
-                        jsonb_build_object(
-                          'participant_key', ap2.participant_key,
-                          'display_name', ap2.display_name,
-                          'record', COALESCE(
-                            jsonb_build_object(
-                              'entry_source', r.entry_source,
-                              'checked_in_at', r.checked_in_at,
-                              'reported_wake_window', r.reported_wake_window,
-                              'wake_points', r.wake_points,
-                              'sleep_back_at', r.sleep_back_at,
-                              'daily_net', (r.wake_points - CASE WHEN r.sleep_back_at IS NOT NULL THEN 1 ELSE 0 END)
-                            ),
-                            NULL
-                          )
-                        )
-                        ORDER BY ap2.sort_order
-                      )
-               FROM all_pairs ap2
-               LEFT JOIN recs r ON r.participant_key = ap2.participant_key AND r.challenge_date = ap.challenge_date
-               WHERE ap2.challenge_date = ap.challenge_date
+  SELECT COALESCE(
+           jsonb_agg(
+             jsonb_build_object(
+               'date', d.d,
+               'rows', day_rows.rows
              )
-           )
-           ORDER BY ap.challenge_date
+             ORDER BY d.d
+           ),
+           '[]'::jsonb
          )
   INTO v_history
-  FROM (SELECT DISTINCT d, 1 AS dummy FROM dates) ds
-  LEFT JOIN all_pairs ap ON ap.challenge_date = ds.d
-  GROUP BY ap.challenge_date;
+  FROM dates d
+  LEFT JOIN LATERAL (
+    SELECT jsonb_agg(
+             jsonb_build_object(
+               'participant_key', m.participant_key,
+               'display_name', m.display_name,
+               'record', CASE
+                          WHEN r.id IS NULL THEN NULL
+                          ELSE jsonb_build_object(
+                            'entry_source', r.entry_source,
+                            'checked_in_at', r.checked_in_at,
+                            'reported_wake_window', r.reported_wake_window,
+                            'wake_points', r.wake_points,
+                            'sleep_back_at', r.sleep_back_at,
+                            'daily_net', (r.wake_points - CASE WHEN r.sleep_back_at IS NOT NULL THEN 1 ELSE 0 END)
+                          )
+                        END
+             )
+             ORDER BY m.sort_order
+           ) AS rows
+    FROM public.challenge_members m
+    LEFT JOIN public.daily_check_ins r
+      ON r.challenge_id = v_challenge_id
+     AND r.participant_key = m.participant_key
+     AND r.challenge_date = d.d
+    WHERE m.challenge_id = v_challenge_id
+  ) day_rows ON true;
 
   RETURN jsonb_build_object(
     'server_now', v_now,
