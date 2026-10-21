@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Keep this in sync with .nvmrc so local and Netlify builds match.
+  NODE_VERSION = "20.18.1"
+
+# The app is a single page (no path-based routing), but send unknown paths to
+# index.html instead of 404ing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Vite fingerprints these filenames, so they can be cached forever.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

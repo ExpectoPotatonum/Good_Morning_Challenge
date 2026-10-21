@@ -170,10 +170,20 @@ See `tests/db/README.md` for details.
 
 ## Deployment (Netlify)
 
+`netlify.toml` already pins the build, the publish directory and the Node
+version, so a Netlify site only needs the two environment variables:
+
 - Build command: `npm run build`
 - Publish directory: `dist`
 - Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
-- Node version: the one in `.nvmrc`
+- Node version: the one in `.nvmrc` (`netlify.toml` sets `NODE_VERSION` too)
+
+Set the variables under **Site configuration → Environment variables** (or as
+`VITE_*` variables in `netlify.toml` — they are public by design). The
+publishable key is safe in the browser; never add a secret or service-role key.
+
+If the repository is linked to a Netlify site through the GitHub integration,
+every push to `master` deploys automatically.
 
 No rewrite is needed: the app uses modals, not path-based routing. If Netlify
 flags the publishable key as a secret, safelist that exact value with
