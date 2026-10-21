@@ -10,26 +10,63 @@ import {
 } from '../src/utils/format';
 
 describe('copy variants', () => {
-  it('stage 1 has the five titles plus the image-backed variant', () => {
+  it('stage 1 has the original titles plus every added one', () => {
     const labels = STAGE1_BUTTONS.map((v) => v.label);
-    expect(labels).toContain('GOOD MOANING');
-    expect(labels).toContain('GOOD MEOWING');
-    expect(labels).toContain('GOOD MORNING');
-    expect(labels).toContain('good morning');
-    expect(labels).toContain('早上好中国，现在我有冰淇淋，我很喜欢冰淇淋');
-    expect(STAGE1_BUTTONS.some((v) => v.image === 'zao')).toBe(true);
+    for (const original of [
+      'GOOD MOANING',
+      'GOOD MEOWING',
+      'GOOD MORNING',
+      'good morning',
+      '早上好中国，现在我有冰淇淋，我很喜欢冰淇淋',
+    ]) {
+      expect(labels).toContain(original);
+    }
+    for (const added of [
+      'WAKE UP BABE',
+      'SNOOZE = -1 PT',
+      'RISE AND SHINE SIA MF',
+      'MORNING WOOD',
+      'RISE AND GRIND',
+      'GET YOUR ASS UP',
+      'SHAKE A LEG (not that one)',
+      'MORNING GLORY',
+      'BED IS FOR LOSERS',
+      'SLEEP IS FOR THE WEAK',
+      'WAKE UP CAN OR NOT',
+      'WAKE UP LIAO',
+    ]) {
+      expect(labels).toContain(added);
+    }
+  });
+
+  it('stage 1 has one variant per artwork file', () => {
+    const images = STAGE1_BUTTONS.filter((v) => v.image).map((v) => v.image);
+    expect(images).toEqual(['zao', 'zao1', 'zao2', 'zao3', 'zao4']);
   });
 
   it('sleep-back modal has every title from the spec', () => {
-    expect(SLEEP_BACK_TITLES).toHaveLength(11);
-    expect(SLEEP_BACK_TITLES).toContain('hehe ur losing 1 pt');
-    expect(SLEEP_BACK_TITLES).toContain('today rly tired sia');
+    expect(SLEEP_BACK_TITLES).toHaveLength(20);
+    for (const title of [
+      'hehe ur losing 1 pt',
+      'today rly tired sia',
+      'bro.',
+      'u were doing so well',
+      'back to bed?? JAIL.',
+      'i told meowmeow',
+      'shame. shame. shame.',
+      'the pillow won',
+      'bro really said zzz',
+      'sleep is for the weak',
+      'NAURRR not again',
+    ]) {
+      expect(SLEEP_BACK_TITLES).toContain(title);
+    }
   });
 
   it('exact required strings are present', () => {
     expect(COPY.stage1Helper).toBe('click below to check in for the day');
     expect(COPY.notHavingGoodMorning).toBe('Not having a good morning? Click me');
-    expect(COPY.meowBlessing).toBe(':ur blessed by meowmeow, now GOOD MORNING to you');
+    expect(COPY.meowBlessing).toBe('ur blessed by meowmeow, now GOOD MORNING to you');
     expect(COPY.yay).toBe('yay');
     expect(COPY.sleepBackYea).toBe('Yea ig...');
     expect(COPY.sleepBackNah).toBe('NAH JK i click for fun');

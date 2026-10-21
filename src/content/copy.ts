@@ -11,10 +11,13 @@ export const PARTICIPANTS: ReadonlyArray<{ key: string; displayName: string }> =
   { key: 'player_2', displayName: 'Bingsu' },
 ];
 
+/** Artwork variants. Each key maps to a WebP in the repo root. */
+export type Stage1Image = 'zao' | 'zao1' | 'zao2' | 'zao3' | 'zao4';
+
 export type Stage1Variant = {
   label: string;
   /** Optional image-backed variant using an asset already in the repo. */
-  image?: 'zao';
+  image?: Stage1Image;
 };
 
 export const STAGE1_BUTTONS: readonly Stage1Variant[] = [
@@ -23,7 +26,23 @@ export const STAGE1_BUTTONS: readonly Stage1Variant[] = [
   { label: 'GOOD MORNING' },
   { label: 'good morning' },
   { label: '早上好中国，现在我有冰淇淋，我很喜欢冰淇淋' },
+  { label: 'WAKE UP BABE' },
+  { label: 'SNOOZE = -1 PT' },
+  { label: 'RISE AND SHINE SIA MF' },
+  { label: 'MORNING WOOD' },
+  { label: 'RISE AND GRIND' },
+  { label: 'GET YOUR ASS UP' },
+  { label: 'SHAKE A LEG (not that one)' },
+  { label: 'MORNING GLORY' },
+  { label: 'BED IS FOR LOSERS' },
+  { label: 'SLEEP IS FOR THE WEAK' },
+  { label: 'WAKE UP CAN OR NOT' },
+  { label: 'WAKE UP LIAO' },
   { label: 'GOOD MORNING', image: 'zao' },
+  { label: 'GOOD MORNING', image: 'zao1' },
+  { label: 'GOOD MORNING', image: 'zao2' },
+  { label: 'GOOD MORNING', image: 'zao3' },
+  { label: 'GOOD MORNING', image: 'zao4' },
 ];
 
 export const SLEEP_BACK_TITLES = [
@@ -38,6 +57,15 @@ export const SLEEP_BACK_TITLES = [
   'TOO TIRED SIA',
   'CMI',
   'today rly tired sia',
+  'bro.',
+  'u were doing so well',
+  'back to bed?? JAIL.',
+  'i told meowmeow',
+  'shame. shame. shame.',
+  'the pillow won',
+  'bro really said zzz',
+  'sleep is for the weak',
+  'NAURRR not again',
 ] as const;
 
 export const WAKE_POINT_TABLE: ReadonlyArray<{ window: string; points: number }> = [
@@ -63,7 +91,7 @@ export const COPY = {
   appTitle: 'Good Morning Challenge',
   stage1Helper: 'click below to check in for the day',
   notHavingGoodMorning: 'Not having a good morning? Click me',
-  meowBlessing: ':ur blessed by meowmeow, now GOOD MORNING to you',
+  meowBlessing: 'ur blessed by meowmeow, now GOOD MORNING to you',
   yay: 'yay',
   switchPlayer: 'Switch player',
   didYouSleepBack: 'did u slp back?',
@@ -109,6 +137,8 @@ export const COPY = {
   historyWake: 'Wake',
   historySleepBackColumn: 'Sleep back',
   historyNet: 'Net',
+  demoLabel: 'DEMO',
+  demoResetHint: 'reload resets',
 } as const;
 
 export function pickOne<T>(arr: readonly T[]): T {

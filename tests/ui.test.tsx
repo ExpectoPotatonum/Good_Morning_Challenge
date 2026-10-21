@@ -4,6 +4,16 @@ import userEvent from '@testing-library/user-event';
 
 const rpc = vi.fn();
 
+/**
+ * Accessible name of the Stage 1 check-in button for whichever random variant
+ * it happens to show. Built from the real copy list, with regex metacharacters
+ * escaped, so adding or renaming titles never breaks this test.
+ */
+const stage1ButtonName = () => {
+  const labels = STAGE1_BUTTONS.map((v) => v.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return new RegExp(`^(早安图 )?(${labels.join('|')})$`);
+};
+
 vi.mock('../src/lib/supabase', () => ({
   supabase: {
     rpc: (...args: unknown[]) => rpc(...args),
@@ -12,7 +22,7 @@ vi.mock('../src/lib/supabase', () => ({
 
 import App from '../src/App';
 import { AppProvider } from '../src/AppContext';
-import { COPY } from '../src/content/copy';
+import { COPY, STAGE1_BUTTONS } from '../src/content/copy';
 
 const PARTICIPANTS = [
   {
@@ -93,11 +103,7 @@ describe('stage 1', () => {
     await waitFor(() => expect(screen.getByText(COPY.stage1Helper)).toBeTruthy());
 
     rpc.mockResolvedValueOnce({ data: { ok: true, code: 'OK', wake_points: 4 }, error: null });
-    await userEvent.click(
-      screen.getByRole('button', {
-        name: /^(早安图 )?(GOOD MOANING|GOOD MEOWING|GOOD MORNING|good morning|早上好.*)$/,
-      }),
-    );
+    await userEvent.click(screen.getByRole('button', { name: stage1ButtonName() }));
 
     await waitFor(() =>
       expect(rpc).toHaveBeenCalledWith('check_in_today', { p_participant_key: 'player_1' }),

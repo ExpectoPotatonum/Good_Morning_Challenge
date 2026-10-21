@@ -1,11 +1,18 @@
 import { useState } from 'react';
-import { COPY, pickOne, STAGE1_BUTTONS } from '../content/copy';
+import { COPY, pickOne, STAGE1_BUTTONS, type Stage1Image } from '../content/copy';
 import { supabase } from '../lib/supabase';
 import { useApp } from '../useApp';
 import { Modal } from './Modal';
 import { formatAward } from '../utils/format';
 import meow from '../../meowmeow.webp';
 import zao from '../../早安图.webp';
+import zao1 from '../../早安图1.webp';
+import zao2 from '../../早安图2.webp';
+import zao3 from '../../早安图3.webp';
+import zao4 from '../../早安图4.webp';
+
+/** Artwork for each image-backed variant. */
+const STAGE1_IMAGES: Record<Stage1Image, string> = { zao, zao1, zao2, zao3, zao4 };
 
 export function Stage1() {
   const { participantKey, refresh } = useApp();
@@ -61,6 +68,7 @@ export function Stage1() {
   };
 
   const showImage = !!variant.image && !imageFailed;
+  const imageSrc = variant.image ? STAGE1_IMAGES[variant.image] : zao;
   const isLongLabel = variant.label.length > 12;
 
   return (
@@ -102,7 +110,7 @@ export function Stage1() {
         >
           {showImage ? (
             <img
-              src={zao}
+              src={imageSrc}
               alt="早安图"
               onError={() => setImageFailed(true)}
               style={{ maxWidth: 140, maxHeight: 92, display: 'block', margin: '0 auto 12px', borderRadius: 8 }}
