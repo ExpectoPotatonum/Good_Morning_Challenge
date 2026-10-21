@@ -73,6 +73,13 @@ supabase db push
 >
 > All four are idempotent, so re-running them does not duplicate data.
 
+### Pending migration on the live project
+
+`20261021000007_fix_dashboard_history.sql` rebuilds `get_dashboard()` so the
+history contains one entry per challenge date (11 entries) instead of one
+entry per participant. Apply it with `supabase db push`, or paste the file
+into the Dashboard → SQL Editor. `CREATE OR REPLACE` makes it safe to re-run.
+
 ### Local Supabase (optional)
 
 ```bash
@@ -139,7 +146,18 @@ npm run build     # tsc -b && vite build
 | `tests/scoring.test.ts` | scorer boundaries |
 | `tests/copy.test.ts` | copy strings, variants, timezone formatting |
 | `tests/ui.test.tsx` | stage 1/2/3, modals, pending/error states, challenge over |
+| `tests/live.test.tsx` | renders the real app against the real database (read-only) |
 | `tests/db/integration.test.ts` | database behaviour (skipped unless `SUPABASE_TEST_DB_URL` is set) |
+
+`tests/live.test.tsx` runs automatically when `.env.local` points at a Supabase
+project, and is skipped otherwise. It only calls `get_dashboard()` — it never
+checks in and never applies a penalty.
+
+Verify the live project without the test runner:
+
+```bash
+npm run verify:db
+```
 
 Database integration tests need a **dedicated** test database — they insert
 rows and roll them back, so never point them at the live challenge project:
