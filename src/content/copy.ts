@@ -84,7 +84,7 @@ export const COPY = {
   pointsSuffix: 'pts',
   lateSuffix: '— late',
   close: 'Close',
-  pickPlayer: 'Select a participant',
+  pickPlayer: 'who r u',
   pickPlayerHint: 'Anyone with the link can pick either player. This is not a login.',
 } as const;
 
