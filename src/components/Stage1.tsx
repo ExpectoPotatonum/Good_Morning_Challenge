@@ -4,8 +4,8 @@ import { supabase } from '../lib/supabase';
 import { useApp } from '../useApp';
 import { Modal } from './Modal';
 import { formatAward } from '../utils/format';
-import meow from '../../meowmeow.png';
-import zao from '../../早安图.png';
+import meow from '../../meowmeow.webp';
+import zao from '../../早安图.webp';
 
 export function Stage1() {
   const { participantKey, refresh } = useApp();

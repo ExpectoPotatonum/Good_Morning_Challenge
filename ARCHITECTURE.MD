@@ -258,11 +258,11 @@ Show only the check-in experience: do **not** show the scoreboard, rules or hist
   - `GOOD MORNING`
   - `good morning`
   - `早上好中国，现在我有冰淇淋，我很喜欢冰淇淋`
-  - An image-backed variant using the existing `早安图.png` image from the repo.
+  - An image-backed variant using the existing `早安图.webp` image from the repo (the original `早安图.png` is kept in the repo but not shipped; the WebP is the same artwork at a fraction of the bytes).
 - Make the long Chinese string fit using responsive typography (for example `clamp()` and `text-wrap: balance`). If the image fails to load, show readable text fallback and keep the action operable.
 - The main button invokes `check_in_today()`.
 - At the bottom show `Not having a good morning? Click me`.
-- Clicking it opens a modal with the existing `meowmeow.png` image and the exact text `:ur blessed by meowmeow, now GOOD MORNING to you` plus a `yay` button.
+- Clicking it opens a modal with the existing `meowmeow.webp` image and the exact text `:ur blessed by meowmeow, now GOOD MORNING to you` plus a `yay` button.
 - **The `yay` button performs the exact same check-in action as the main button.** It awards points and records the timestamp, not merely closes the modal. Keep the modal open while the request is pending; disable repeat submissions. On success, display the points just earned (including `0 pts — late`), close the modal, and transition to Stage 2. On error, keep the modal open and display the error inside it.
 
 ### Stage 2 — Stage 3 shared content plus current-user check-in status and sleep-back prompt
